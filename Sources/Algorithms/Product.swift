@@ -12,9 +12,12 @@
 /// A sequence that represents the product of two sequences' elements.
 public struct Product2<Base1: Sequence, Base2: Collection> {
   /// The outer sequence in the product.
-  public let base1: Base1
+  @usableFromInline
+  internal let base1: Base1
+  
   /// The inner sequence in the product.
-  public let base2: Base2
+  @usableFromInline
+  internal let base2: Base2
   
   @inlinable
   internal init(_ base1: Base1, _ base2: Base2) {
@@ -44,7 +47,8 @@ extension Product2: Sequence {
     }
     
     @inlinable
-    public mutating func next() -> (Base1.Element, Base2.Element)? {
+    public mutating func next() -> (Base1.Element,
+                                    Base2.Element)? {
       // This is the initial state, where i1.next() has never
       // been called, or the final state, where i1.next() has
       // already returned nil.
@@ -121,7 +125,8 @@ extension Product2: Collection where Base1: Collection {
   }
   
   @inlinable
-  public subscript(position: Index) -> (Base1.Element, Base2.Element) {
+  public subscript(position: Index) -> (Base1.Element,
+                                        Base2.Element) {
     (base1[position.i1], base2[position.i2])
   }
   

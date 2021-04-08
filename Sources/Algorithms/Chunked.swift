@@ -11,9 +11,10 @@
 
 /// A collection wrapper that breaks a collection into chunks based on a
 /// predicate or projection.
-public struct LazyChunked<Base: Collection, Subject> {
+public struct Chunked<Base: Collection, Subject> {
   /// The collection that this instance provides a view onto.
-  public let base: Base
+  @usableFromInline
+  internal let base: Base
   
   /// The projection function.
   @usableFromInline
@@ -44,7 +45,7 @@ public struct LazyChunked<Base: Collection, Subject> {
   }
 }
 
-extension LazyChunked: LazyCollectionProtocol {
+extension Chunked: LazyCollectionProtocol {
   /// A position in a chunked collection.
   public struct Index: Comparable {
     /// The range corresponding to the chunk at this position.
@@ -105,9 +106,9 @@ extension LazyChunked: LazyCollectionProtocol {
   }
 }
 
-extension LazyChunked.Index: Hashable where Base.Index: Hashable {}
+extension Chunked.Index: Hashable where Base.Index: Hashable {}
 
-extension LazyChunked: BidirectionalCollection
+extension Chunked: BidirectionalCollection
   where Base: BidirectionalCollection
 {
   /// Returns the index in the base collection of the start of the chunk ending
@@ -130,6 +131,9 @@ extension LazyChunked: BidirectionalCollection
   }
 }
 
+@available(*, deprecated, renamed: "Chunked")
+public typealias LazyChunked<Base: Collection, Subject> = Chunked<Base, Subject>
+
 //===----------------------------------------------------------------------===//
 // lazy.chunked(by:)
 //===----------------------------------------------------------------------===//
@@ -142,8 +146,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked(
     by belongInSameGroup: @escaping (Element, Element) -> Bool
-  ) -> LazyChunked<Elements, Element> {
-    LazyChunked(
+  ) -> Chunked<Elements, Element> {
+    Chunked(
       base: elements,
       projection: { $0 },
       belongInSameGroup: belongInSameGroup)
@@ -156,8 +160,8 @@ extension LazyCollectionProtocol {
   @inlinable
   public func chunked<Subject: Equatable>(
     on projection: @escaping (Element) -> Subject
-  ) -> LazyChunked<Elements, Subject> {
-    LazyChunked(
+  ) -> Chunked<Elements, Subject> {
+    Chunked(
       base: elements,
       projection: projection,
       belongInSameGroup: ==)
@@ -514,12 +518,13 @@ extension ChunkedByCount: Equatable where Base: Equatable {}
 // Since we have another stored property of type `Index` on the
 // collection, synthesis of `Hashble` conformace would require
 // a `Base.Index: Hashable` constraint, so we implement the hasher
-// only in terms of `base`. Since the computed index is based on it,
-// it should not make a difference here.
+// only in terms of `base` and `chunkCount`. Since the computed
+// index is based on it, it should not make a difference here.
 extension ChunkedByCount: Hashable where Base: Hashable {
   @inlinable
   public func hash(into hasher: inout Hasher) {
     hasher.combine(base)
+    hasher.combine(chunkCount)
   }
 }
 extension ChunkedByCount.Index: Hashable where Base.Index: Hashable {}
