@@ -8,11 +8,79 @@ This project follows semantic versioning. While still in major version `0`,
 source-stability is only guaranteed within minor versions (e.g. between
 `0.0.3` and `0.0.4`). If you want to guard against potentially source-breaking
 package updates, you can specify your package dependency using
-`.upToNextMinor(from: "0.0.1")` as the requirement.
+`.upToNextMinor(from: "0.1.0")` as the requirement.
 
 ## [Unreleased]
 
-*No changes yet.*
+*No new changes.*
+
+---
+
+## [0.2.0] - 2021-05-17
+
+### Additions
+
+Two new additions to the list of algorithms:
+
+- `adjacentPairs()` lazily iterates over tuples of adjacent elements of a
+  sequence. ([#119])
+- `minAndMax()` finds both the smallest and largest elements of a sequence in 
+  a single pass. ([#90])
+
+### Changes
+
+- When calling `chunked(on:)`, the resulting collection has an element type of
+  `(Subject, SubSequence)` instead of just `SubSequence`, making the subject
+  value available when iterating.
+
+    ```swift
+    let numbers = [5, 6, -3, -9, -11, 2, 7, 6]
+    for (signum, values) in numbers.chunked(on: { $0.signum() }) {
+        print(signum, values)
+    }
+    // 1 [5, 6]
+    // -1 [-3, -9, -11]
+    // 1 [2, 7, 6]
+    ```
+
+### Fixes
+
+- Improvements to the documentation and PR templates.
+
+The 0.2.0 release includes contributions from [CTMacUser], [LemonSpike],
+[mpangburn], and [natecook1000]. Thank you!
+
+---
+
+## [0.1.1] - 2021-04-14
+
+### Fixes
+
+- `Product2` associated type inference error in release build ([#130])
+
+## [0.1.0] - 2021-04-13
+
+### Additions
+
+- The `compacted()` method lazily finds the non-`nil` elements of a sequence or
+  collection ([#112]).
+
+### Changes
+
+- The `uniqued()` method now lazily computes the unique elements of a sequence
+  or a collection ([#71]). Pass this resulting sequence to an `Array`
+  initializer to recover the behavior of the previous release.
+- Calling `cycled(times:)` now returns a new `FiniteCycle` type, which has the
+  same conformances as its underlying collection ([#106]). 
+- The base collections of the sequence and collection wrapper types are no
+  longer public ([#85], [#125]), and the wrapper types no longer conform to the
+  `Equatable` or `Hashable` protocols ([#124]). If you need those conformances,
+  convert the wrapper type to an `Array` or other collection currrency type
+  before storing. Please file an issue if these changes pose a problem for your
+  use case.
+
+The 0.1.0 release includes contributions from [LemonSpike], [LucianoPAlmeida], 
+[natecook1000], and [timvermeulen]. Thank you!
 
 ---
 
@@ -123,7 +191,10 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 
 <!-- Link references for releases -->
 
-[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.0.4...HEAD
+[Unreleased]: https://github.com/apple/swift-algorithms/compare/0.2.0...HEAD
+[0.2.0]: https://github.com/apple/swift-algorithms/compare/0.1.1...0.2.0
+[0.1.1]: https://github.com/apple/swift-algorithms/compare/0.1.0...0.1.1
+[0.1.0]: https://github.com/apple/swift-algorithms/compare/0.0.4...0.1.0
 [0.0.4]: https://github.com/apple/swift-algorithms/compare/0.0.3...0.0.4
 [0.0.3]: https://github.com/apple/swift-algorithms/compare/0.0.2...0.0.3
 [0.0.2]: https://github.com/apple/swift-algorithms/compare/0.0.1...0.0.2
@@ -142,15 +213,25 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [#54]: https://github.com/apple/swift-algorithms/pull/54
 [#56]: https://github.com/apple/swift-algorithms/pull/56
 [#65]: https://github.com/apple/swift-algorithms/pull/65
+[#71]: https://github.com/apple/swift-algorithms/pull/71
 [#77]: https://github.com/apple/swift-algorithms/pull/77
 [#78]: https://github.com/apple/swift-algorithms/pull/78
+[#85]: https://github.com/apple/swift-algorithms/pull/85
+[#90]: https://github.com/apple/swift-algorithms/pull/90
 [#91]: https://github.com/apple/swift-algorithms/pull/91
+[#106]: https://github.com/apple/swift-algorithms/pull/106
+[#112]: https://github.com/apple/swift-algorithms/pull/112
+[#119]: https://github.com/apple/swift-algorithms/pull/119
+[#124]: https://github.com/apple/swift-algorithms/pull/124
+[#125]: https://github.com/apple/swift-algorithms/pull/125
+[#130]: https://github.com/apple/swift-algorithms/pull/130
 
 <!-- Link references for contributors -->
 
 [AustinConlon]: https://github.com/apple/swift-algorithms/commits?author=AustinConlon
 [benrimmington]: https://github.com/apple/swift-algorithms/commits?author=benrimmington
 [bjhomer]: https://github.com/apple/swift-algorithms/commits?author=bjhomer
+[CTMacUser]: https://github.com/apple/swift-algorithms/commits?author=CTMacUser
 [danielctull]: https://github.com/apple/swift-algorithms/commits?author=danielctull
 [dhruvshah8]: https://github.com/apple/swift-algorithms/commits?author=dhruvshah8
 [egorzhdan]: https://github.com/apple/swift-algorithms/commits?author=egorzhdan
@@ -159,10 +240,12 @@ This changelog's format is based on [Keep a Changelog](https://keepachangelog.co
 [iSame7]: https://github.com/apple/swift-algorithms/commits?author=iSame7
 [karwa]: https://github.com/apple/swift-algorithms/commits?author=karwa
 [kylemacomber]: https://github.com/apple/swift-algorithms/commits?author=kylemacomber
+[LemonSpike]: https://github.com/apple/swift-algorithms/commits?author=LemonSpike
 [LucianoPAlmeida]: https://github.com/apple/swift-algorithms/commits?author=LucianoPAlmeida
 [markuswntr]: https://github.com/apple/swift-algorithms/commits?author=markuswntr
 [mdznr]: https://github.com/apple/swift-algorithms/commits?author=mdznr
 [michiboo]: https://github.com/apple/swift-algorithms/commits?author=michiboo
+[mpangburn]: https://github.com/apple/swift-algorithms/commits?author=mpangburn
 [natecook1000]: https://github.com/apple/swift-algorithms/commits?author=natecook1000
 [nordicio]: https://github.com/apple/swift-algorithms/commits?author=nordicio
 [ollieatkinson]: https://github.com/apple/swift-algorithms/commits?author=ollieatkinson
